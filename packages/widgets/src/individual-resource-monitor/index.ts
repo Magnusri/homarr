@@ -56,5 +56,4 @@ export const { definition, componentLoader } = createWidgetDefinition("individua
     }));
   },
   supportedIntegrations: ["proxmox"],
-  integrationsRequired: true,
 }).withDynamicImport(() => import("./component"));
