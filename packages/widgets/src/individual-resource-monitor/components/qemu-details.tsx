@@ -1,5 +1,5 @@
 import { Badge, Card, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
-import { IconBrain, IconChip, IconClock, IconDatabase, IconNetwork, IconServer } from "@tabler/icons-react";
+import { IconBrain, IconCpu, IconClock, IconDatabase, IconNetwork, IconServer } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 
@@ -37,7 +37,7 @@ export const QemuDetailsComponent = ({ data, visibleSections }: QemuDetailsProps
         {visibleSections.includes("cpu") && (
           <ResourceStatsCard
             title="CPU"
-            icon={IconChip}
+            icon={IconCpu}
             value={`${cpuPercent}%`}
             subtitle={`${data.cpuSockets} socket(s), ${data.cpuCores} core(s) each`}
             progress={{

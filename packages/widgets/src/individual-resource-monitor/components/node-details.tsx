@@ -1,5 +1,5 @@
 import { Badge, Card, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
-import { IconBrain, IconChip, IconClock, IconDatabase, IconServer } from "@tabler/icons-react";
+import { IconBrain, IconCpu, IconClock, IconDatabase, IconServer } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 
@@ -37,7 +37,7 @@ export const NodeDetailsComponent = ({ data, visibleSections }: NodeDetailsProps
         {visibleSections.includes("cpu") && (
           <ResourceStatsCard
             title="CPU"
-            icon={IconChip}
+            icon={IconCpu}
             value={`${cpuPercent}%`}
             subtitle={data.cpuModel}
             progress={{
