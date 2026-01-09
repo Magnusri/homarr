@@ -13,11 +13,11 @@ interface ResourceStatsCardProps {
     label?: string;
   };
   ringProgress?: {
-    sections: Array<{
+    sections: {
       value: number;
       color: string;
       tooltip?: string;
-    }>;
+    }[];
     label?: ReactNode;
   };
   color?: string;

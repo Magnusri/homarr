@@ -1,5 +1,5 @@
 import { Badge, Card, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
-import { IconBrain, IconCpu, IconClock, IconDatabase, IconNetwork, IconServer } from "@tabler/icons-react";
+import { IconBrain, IconClock, IconCpu, IconDatabase, IconNetwork, IconServer } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 

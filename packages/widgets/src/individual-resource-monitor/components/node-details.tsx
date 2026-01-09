@@ -1,5 +1,5 @@
 import { Badge, Card, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
-import { IconBrain, IconCpu, IconClock, IconDatabase, IconServer } from "@tabler/icons-react";
+import { IconBrain, IconClock, IconCpu, IconDatabase, IconServer } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 
@@ -78,12 +78,7 @@ export const NodeDetailsComponent = ({ data, visibleSections }: NodeDetailsProps
         )}
 
         {visibleSections.includes("uptime") && (
-          <ResourceStatsCard
-            title="Uptime"
-            icon={IconClock}
-            value={uptimeFormatted}
-            color="violet"
-          />
+          <ResourceStatsCard title="Uptime" icon={IconClock} value={uptimeFormatted} color="violet" />
         )}
 
         {visibleSections.includes("load") && (
