@@ -21,6 +21,7 @@ import * as healthMonitoring from "./health-monitoring";
 import * as iframe from "./iframe";
 import type { WidgetImportRecord } from "./import";
 import * as indexerManager from "./indexer-manager";
+import * as individualResourceMonitor from "./individual-resource-monitor";
 import * as mediaReleases from "./media-releases";
 import * as mediaRequestsList from "./media-requests/list";
 import * as mediaRequestsStats from "./media-requests/stats";
@@ -67,6 +68,7 @@ export const widgetImports = {
   bookmarks,
   indexerManager,
   healthMonitoring,
+  individualResourceMonitor,
   mediaTranscoding,
   minecraftServerStatus,
   dockerContainers,

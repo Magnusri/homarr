@@ -1936,6 +1936,58 @@
         }
       }
     },
+    "individualResourceMonitor": {
+      "name": "Individual Resource Monitor",
+      "description": "Monitor detailed information about individual Proxmox resources (nodes, VMs, containers, storage).",
+      "option": {
+        "resourceType": {
+          "label": "Resource Type",
+          "description": "Select the type of resource to monitor",
+          "option": {
+            "node": "Node",
+            "lxc": "LXC Container",
+            "qemu": "QEMU Virtual Machine",
+            "storage": "Storage"
+          }
+        },
+        "nodeName": {
+          "label": "Node Name",
+          "description": "Name of the Proxmox node (e.g., pve, pve-node-1)"
+        },
+        "resourceIdentifier": {
+          "label": "Resource Identifier",
+          "description": "VM ID (for LXC/QEMU) or storage name (e.g., 100, 101, local-lvm)"
+        },
+        "refreshInterval": {
+          "label": "Refresh Interval (ms)",
+          "description": "How often to refresh the data in milliseconds (default: 5000)"
+        },
+        "visibleSections": {
+          "label": "Visible Sections",
+          "option": {
+            "cpu": "CPU",
+            "memory": "Memory",
+            "storage": "Storage",
+            "network": "Network",
+            "uptime": "Uptime",
+            "load": "Load Average",
+            "system": "System Information",
+            "container": "Container Information",
+            "snapshots": "Snapshots",
+            "configuration": "Configuration",
+            "type": "Storage Type"
+          }
+        }
+      },
+      "error": {
+        "noIntegration": "No Proxmox integration configured",
+        "noNodeName": "Please specify a node name in widget settings",
+        "noResourceIdentifier": "Please specify a resource identifier (VM ID or storage name)",
+        "invalidVmId": "Invalid VM ID - must be a number",
+        "unknownResourceType": "Unknown resource type",
+        "failedToLoad": "Failed to load resource details"
+      }
+    },
     "dockerContainers": {
       "name": "Docker stats",
       "description": "Stats of your containers (This widget can only be added with administrator privileges)",
