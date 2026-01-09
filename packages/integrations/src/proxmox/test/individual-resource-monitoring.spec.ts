@@ -11,19 +11,21 @@ describe("Proxmox Individual Resource Monitoring Integration", () => {
     name: "Test Proxmox",
     kind: "proxmox" as const,
     url: "https://proxmox.example.com:8006",
-    secrets: [
-      { kind: "username", value: "testuser" },
-      { kind: "realm", value: "pam" },
-      { kind: "tokenId", value: "test-token" },
-      { kind: "apiKey", value: "test-api-key-secret" },
+    externalUrl: null,
+    decryptedSecrets: [
+      { kind: "username" as const, value: "testuser" },
+      { kind: "realm" as const, value: "pam" },
+      { kind: "tokenId" as const, value: "test-token" },
+      { kind: "apiKey" as const, value: "test-api-key-secret" },
     ],
   };
 
   describe("getNodeDetailsAsync", () => {
     test("should fetch and map node details correctly", async () => {
       // Arrange
-      const mockedFetch: typeof undiciFetch = async (url) => {
-        if (url.toString().includes("/nodes/pve/status")) {
+      const _mockedFetch: typeof undiciFetch = async (urlInput) => {
+        const urlString = typeof urlInput === "string" ? urlInput : urlInput instanceof URL ? urlInput.href : "";
+        if (urlString.includes("/nodes/pve/status")) {
           return Promise.resolve(
             new Response(
               JSON.stringify({
@@ -84,8 +86,9 @@ describe("Proxmox Individual Resource Monitoring Integration", () => {
   describe("getLxcDetailsAsync", () => {
     test("should fetch and map LXC container details correctly", async () => {
       // Arrange
-      const mockedFetch: typeof undiciFetch = async (url) => {
-        if (url.toString().includes("/nodes/pve/lxc/100/status/current")) {
+      const _mockedFetch: typeof undiciFetch = async (urlInput) => {
+        const urlString = typeof urlInput === "string" ? urlInput : urlInput instanceof URL ? urlInput.href : "";
+        if (urlString.includes("/nodes/pve/lxc/100/status/current")) {
           return Promise.resolve(
             new Response(
               JSON.stringify({
@@ -109,7 +112,7 @@ describe("Proxmox Individual Resource Monitoring Integration", () => {
             ),
           );
         }
-        if (url.toString().includes("/nodes/pve/lxc/100/config")) {
+        if (urlString.includes("/nodes/pve/lxc/100/config")) {
           return Promise.resolve(
             new Response(
               JSON.stringify({
@@ -157,8 +160,9 @@ describe("Proxmox Individual Resource Monitoring Integration", () => {
   describe("getQemuDetailsAsync", () => {
     test("should fetch and map QEMU VM details correctly", async () => {
       // Arrange
-      const mockedFetch: typeof undiciFetch = async (url) => {
-        if (url.toString().includes("/nodes/pve/qemu/101/status/current")) {
+      const _mockedFetch: typeof undiciFetch = async (urlInput) => {
+        const urlString = typeof urlInput === "string" ? urlInput : urlInput instanceof URL ? urlInput.href : "";
+        if (urlString.includes("/nodes/pve/qemu/101/status/current")) {
           return Promise.resolve(
             new Response(
               JSON.stringify({
@@ -181,7 +185,7 @@ describe("Proxmox Individual Resource Monitoring Integration", () => {
             ),
           );
         }
-        if (url.toString().includes("/nodes/pve/qemu/101/config")) {
+        if (urlString.includes("/nodes/pve/qemu/101/config")) {
           return Promise.resolve(
             new Response(
               JSON.stringify({
@@ -204,7 +208,7 @@ describe("Proxmox Individual Resource Monitoring Integration", () => {
             ),
           );
         }
-        if (url.toString().includes("/nodes/pve/qemu/101/snapshot")) {
+        if (urlString.includes("/nodes/pve/qemu/101/snapshot")) {
           return Promise.resolve(
             new Response(
               JSON.stringify({
@@ -246,8 +250,9 @@ describe("Proxmox Individual Resource Monitoring Integration", () => {
   describe("getStorageDetailsAsync", () => {
     test("should fetch and map storage details correctly", async () => {
       // Arrange
-      const mockedFetch: typeof undiciFetch = async (url) => {
-        if (url.toString().includes("/nodes/pve/storage/local-lvm/status")) {
+      const _mockedFetch: typeof undiciFetch = async (urlInput) => {
+        const urlString = typeof urlInput === "string" ? urlInput : urlInput instanceof URL ? urlInput.href : "";
+        if (urlString.includes("/nodes/pve/storage/local-lvm/status")) {
           return Promise.resolve(
             new Response(
               JSON.stringify({
@@ -268,7 +273,7 @@ describe("Proxmox Individual Resource Monitoring Integration", () => {
             ),
           );
         }
-        if (url.toString().includes("/storage")) {
+        if (urlString.includes("/storage")) {
           return Promise.resolve(
             new Response(
               JSON.stringify({

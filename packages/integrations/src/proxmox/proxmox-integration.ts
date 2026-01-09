@@ -67,33 +67,40 @@ export class ProxmoxIntegration
    */
   public async getNodeDetailsAsync(nodeName: string): Promise<NodeDetails> {
     const proxmox = this.getPromoxApi();
-    const nodeStatus = await proxmox.nodes.$(nodeName).status.$get();
+    const nodeStatus = (await proxmox.nodes.$(nodeName).status.$get()) as Record<string, unknown>;
 
     logger.info("Retrieved node details", { nodeName });
 
+    const pveversion = typeof nodeStatus.pveversion === "string" ? nodeStatus.pveversion : undefined;
+    const kversion = typeof nodeStatus.kversion === "string" ? nodeStatus.kversion : undefined;
+    const cpuinfo = nodeStatus.cpuinfo as { model?: string; cpus?: number } | undefined;
+    const cpu = typeof nodeStatus.cpu === "number" ? nodeStatus.cpu : 0;
+    const memory = nodeStatus.memory as { total?: number; used?: number } | undefined;
+    const swap = nodeStatus.swap as { total?: number; used?: number } | undefined;
+    const rootfs = nodeStatus.rootfs as { total?: number; used?: number } | undefined;
+    const uptime = typeof nodeStatus.uptime === "number" ? nodeStatus.uptime : 0;
+    const loadavg = Array.isArray(nodeStatus.loadavg) ? nodeStatus.loadavg : [];
+
     return {
       name: nodeName,
-      status: nodeStatus.pveversion ? "online" : "offline",
-      isOnline: !!nodeStatus.pveversion,
-      cpuModel: nodeStatus.cpuinfo?.model ?? "Unknown",
-      cpuCores: nodeStatus.cpuinfo?.cpus ?? 0,
-      cpuUtilization: nodeStatus.cpu ?? 0,
-      memoryTotal: nodeStatus.memory?.total ?? 0,
-      memoryUsed: nodeStatus.memory?.used ?? 0,
-      swapTotal: nodeStatus.swap?.total ?? 0,
-      swapUsed: nodeStatus.swap?.used ?? 0,
-      rootFsTotal: nodeStatus.rootfs?.total ?? 0,
-      rootFsUsed: nodeStatus.rootfs?.used ?? 0,
-      uptime: nodeStatus.uptime ?? 0,
-      loadAverage1:
-        Array.isArray(nodeStatus.loadavg) && typeof nodeStatus.loadavg[0] === "number" ? nodeStatus.loadavg[0] : 0,
-      loadAverage5:
-        Array.isArray(nodeStatus.loadavg) && typeof nodeStatus.loadavg[1] === "number" ? nodeStatus.loadavg[1] : 0,
-      loadAverage15:
-        Array.isArray(nodeStatus.loadavg) && typeof nodeStatus.loadavg[2] === "number" ? nodeStatus.loadavg[2] : 0,
-      version: nodeStatus.pveversion ?? "Unknown",
-      kernelVersion: nodeStatus.kversion ?? "Unknown",
-      pveVersion: nodeStatus.pveversion ?? "Unknown",
+      status: pveversion ? "online" : "offline",
+      isOnline: !!pveversion,
+      cpuModel: cpuinfo?.model ?? "Unknown",
+      cpuCores: cpuinfo?.cpus ?? 0,
+      cpuUtilization: cpu,
+      memoryTotal: memory?.total ?? 0,
+      memoryUsed: memory?.used ?? 0,
+      swapTotal: swap?.total ?? 0,
+      swapUsed: swap?.used ?? 0,
+      rootFsTotal: rootfs?.total ?? 0,
+      rootFsUsed: rootfs?.used ?? 0,
+      uptime,
+      loadAverage1: typeof loadavg[0] === "number" ? loadavg[0] : 0,
+      loadAverage5: typeof loadavg[1] === "number" ? loadavg[1] : 0,
+      loadAverage15: typeof loadavg[2] === "number" ? loadavg[2] : 0,
+      version: pveversion ?? "Unknown",
+      kernelVersion: kversion ?? "Unknown",
+      pveVersion: pveversion ?? "Unknown",
     };
   }
 
@@ -105,39 +112,61 @@ export class ProxmoxIntegration
    */
   public async getLxcDetailsAsync(nodeName: string, vmId: number): Promise<LxcDetails> {
     const proxmox = this.getPromoxApi();
-    const [status, config] = await Promise.all([
+    const [statusRaw, configRaw] = await Promise.all([
       proxmox.nodes.$(nodeName).lxc.$(vmId).status.current.$get(),
       proxmox.nodes.$(nodeName).lxc.$(vmId).config.$get(),
     ]);
+
+    const status = statusRaw as Record<string, unknown>;
+    const config = configRaw as Record<string, unknown>;
 
     logger.info("Retrieved LXC details", { nodeName, vmId });
 
     const networkInterfaces = this.parseNetworkInterfaces(config, "lxc");
     const disks = this.parseDisksConfig(config, "lxc");
 
+    const statusName = typeof status.name === "string" ? status.name : undefined;
+    const statusStatus = typeof status.status === "string" ? status.status : "unknown";
+    const statusCpu = typeof status.cpu === "number" ? status.cpu : 0;
+    const statusMaxmem = typeof status.maxmem === "number" ? status.maxmem : 0;
+    const statusMem = typeof status.mem === "number" ? status.mem : 0;
+    const statusMaxswap = typeof status.maxswap === "number" ? status.maxswap : 0;
+    const statusSwap = typeof status.swap === "number" ? status.swap : 0;
+    const statusMaxdisk = typeof status.maxdisk === "number" ? status.maxdisk : 0;
+    const statusDisk = typeof status.disk === "number" ? status.disk : 0;
+    const statusUptime = typeof status.uptime === "number" ? status.uptime : 0;
+
+    const configOstype = typeof config.ostype === "string" ? config.ostype : undefined;
+    const configHostname = typeof config.hostname === "string" ? config.hostname : undefined;
+    const configCores = typeof config.cores === "number" ? config.cores : 1;
+    const configUnprivileged = config.unprivileged;
+    const configProtection = config.protection;
+    const configTags = typeof config.tags === "string" ? config.tags : undefined;
+    const configDescription = typeof config.description === "string" ? config.description : undefined;
+
     return {
       vmId,
-      name: status.name ?? `CT ${vmId}`,
+      name: statusName ?? `CT ${vmId}`,
       node: nodeName,
-      status: status.status ?? "unknown",
-      isRunning: status.status === "running",
-      osType: config.ostype,
-      hostname: config.hostname,
-      cpuCores: config.cores!,
-      cpuUtilization: status.cpu ?? 0,
-      memoryTotal: status.maxmem ?? 0,
-      memoryUsed: status.mem ?? 0,
-      swapTotal: status.maxswap ?? 0,
-      swapUsed: status.swap ?? 0,
-      diskTotal: status.maxdisk ?? 0,
-      diskUsed: status.disk ?? 0,
-      uptime: status.uptime ?? 0,
+      status: statusStatus,
+      isRunning: statusStatus === "running",
+      osType: configOstype,
+      hostname: configHostname,
+      cpuCores: configCores,
+      cpuUtilization: statusCpu,
+      memoryTotal: statusMaxmem,
+      memoryUsed: statusMem,
+      swapTotal: statusMaxswap,
+      swapUsed: statusSwap,
+      diskTotal: statusMaxdisk,
+      diskUsed: statusDisk,
+      uptime: statusUptime,
       networkInterfaces,
       disks,
-      privileged: config.unprivileged !== true && config.unprivileged !== 1,
-      protected: config.protection === true || config.protection === 1,
-      tags: config.tags,
-      description: config.description,
+      privileged: configUnprivileged !== true && configUnprivileged !== 1,
+      protected: configProtection === true || configProtection === 1,
+      tags: configTags,
+      description: configDescription,
     };
   }
 
@@ -151,10 +180,13 @@ export class ProxmoxIntegration
    */
   public async getQemuDetailsAsync(nodeName: string, vmId: number): Promise<QemuDetails> {
     const proxmox = this.getPromoxApi();
-    const [status, config] = await Promise.all([
+    const [statusRaw, configRaw] = await Promise.all([
       proxmox.nodes.$(nodeName).qemu.$(vmId).status.current.$get(),
       proxmox.nodes.$(nodeName).qemu.$(vmId).config.$get(),
     ]);
+
+    const status = statusRaw as Record<string, unknown>;
+    const config = configRaw as Record<string, unknown>;
 
     logger.info("Retrieved QEMU details", { nodeName, vmId });
 
@@ -171,13 +203,20 @@ export class ProxmoxIntegration
       config.agent === "1";
     if (agentEnabled && status.status === "running") {
       try {
-        const osInfo = await proxmox.nodes.$(nodeName).qemu.$(vmId).agent["get-osinfo"].$get();
-        if (osInfo?.result) {
+        const osInfoRaw = (await proxmox.nodes.$(nodeName).qemu.$(vmId).agent["get-osinfo"].$get()) as Record<
+          string,
+          unknown
+        >;
+        const osInfoResult =
+          typeof osInfoRaw.result === "object" && osInfoRaw.result !== null
+            ? (osInfoRaw.result as Record<string, unknown>)
+            : undefined;
+        if (osInfoResult) {
           guestOsInfo = {
-            name: osInfo.result.name as string | undefined,
-            version: osInfo.result.version as string | undefined,
-            kernel: osInfo.result["kernel-version"] as string | undefined,
-            architecture: osInfo.result.machine as string | undefined,
+            name: typeof osInfoResult.name === "string" ? osInfoResult.name : undefined,
+            version: typeof osInfoResult.version === "string" ? osInfoResult.version : undefined,
+            kernel: typeof osInfoResult["kernel-version"] === "string" ? osInfoResult["kernel-version"] : undefined,
+            architecture: typeof osInfoResult.machine === "string" ? osInfoResult.machine : undefined,
           };
         }
       } catch (error) {
@@ -188,39 +227,60 @@ export class ProxmoxIntegration
     // Try to get snapshot count
     let snapshotCount = 0;
     try {
-      const snapshots = await proxmox.nodes.$(nodeName).qemu.$(vmId).snapshot.$get();
-      snapshotCount = snapshots ? snapshots.length - 1 : 0; // Exclude current state
+      const snapshotsRaw = await proxmox.nodes.$(nodeName).qemu.$(vmId).snapshot.$get();
+      const snapshots = Array.isArray(snapshotsRaw) ? snapshotsRaw : [];
+      snapshotCount = snapshots.length > 0 ? snapshots.length - 1 : 0; // Exclude current state
     } catch (error) {
       logger.debug("Failed to get snapshot count", { nodeName, vmId, error });
     }
 
+    const statusName = typeof status.name === "string" ? status.name : undefined;
+    const statusStatus = typeof status.status === "string" ? status.status : "unknown";
+    const statusCpu = typeof status.cpu === "number" ? status.cpu : 0;
+    const statusMaxmem = typeof status.maxmem === "number" ? status.maxmem : 0;
+    const statusMem = typeof status.mem === "number" ? status.mem : 0;
+    const statusMaxdisk = typeof status.maxdisk === "number" ? status.maxdisk : 0;
+    const statusDisk = typeof status.disk === "number" ? status.disk : 0;
+    const statusUptime = typeof status.uptime === "number" ? status.uptime : 0;
+
+    const configSockets = typeof config.sockets === "number" ? config.sockets : 1;
+    const configCores = typeof config.cores === "number" ? config.cores : 1;
+    const configCpu = typeof config.cpu === "string" ? config.cpu : undefined;
+    const configProtection = config.protection;
+    const configTags = typeof config.tags === "string" ? config.tags : undefined;
+    const configDescription = typeof config.description === "string" ? config.description : undefined;
+    const configBoot = typeof config.boot === "string" ? config.boot : undefined;
+    const configVga = typeof config.vga === "string" ? config.vga : undefined;
+    const configBios = typeof config.bios === "string" ? config.bios : undefined;
+    const configMachine = typeof config.machine === "string" ? config.machine : undefined;
+
     return {
       vmId,
-      name: status.name ?? `VM ${vmId}`,
+      name: statusName ?? `VM ${vmId}`,
       node: nodeName,
-      status: status.status ?? "unknown",
-      isRunning: status.status === "running",
-      cpuSockets: config.sockets! ?? 1,
-      cpuCores: config.cores! ?? 1,
-      cpuType: config.cpu,
-      cpuUtilization: status.cpu ?? 0,
-      memoryTotal: status.maxmem ?? 0,
-      memoryUsed: status.mem ?? 0,
-      diskTotal: status.maxdisk ?? 0,
-      diskUsed: status.disk ?? 0,
-      uptime: status.uptime ?? 0,
+      status: statusStatus,
+      isRunning: statusStatus === "running",
+      cpuSockets: configSockets,
+      cpuCores: configCores,
+      cpuType: configCpu,
+      cpuUtilization: statusCpu,
+      memoryTotal: statusMaxmem,
+      memoryUsed: statusMem,
+      diskTotal: statusMaxdisk,
+      diskUsed: statusDisk,
+      uptime: statusUptime,
       networkInterfaces,
       disks,
       agentEnabled,
       guestOsInfo,
       snapshotCount,
-      bootOrder: config.boot,
-      vgaType: config.vga,
-      biosType: config.bios,
-      machineType: config.machine,
-      protected: config.protection === true || config.protection === 1,
-      tags: config.tags,
-      description: config.description,
+      bootOrder: configBoot,
+      vgaType: configVga,
+      biosType: configBios,
+      machineType: configMachine,
+      protected: configProtection === true || configProtection === 1,
+      tags: configTags,
+      description: configDescription,
     };
   }
 
@@ -232,38 +292,54 @@ export class ProxmoxIntegration
    */
   public async getStorageDetailsAsync(nodeName: string, storageName: string): Promise<StorageDetails> {
     const proxmox = this.getPromoxApi();
-    const [status, storages] = await Promise.all([
+    const [statusRaw, storagesRaw] = (await Promise.all([
       proxmox.nodes.$(nodeName).storage.$(storageName).status.$get(),
       proxmox.storage.$get(),
-    ]);
+    ])) as [Record<string, unknown>, unknown];
+
+    const status = statusRaw;
+    const storages = Array.isArray(storagesRaw) ? storagesRaw : [];
 
     logger.info("Retrieved storage details", { nodeName, storageName });
 
     // Find the storage configuration from the storage list
-    const storageConfig = storages.find((s) => s.storage === storageName);
+    const storageConfig = storages.find(
+      (storageItem) => (storageItem as Record<string, unknown>).storage === storageName,
+    ) as Record<string, unknown> | undefined;
+
+    const statusActive = typeof status.active === "number" ? status.active : 0;
+    const statusType = typeof status.type === "string" ? status.type : "unknown";
+    const statusTotal = typeof status.total === "number" ? status.total : 0;
+    const statusUsed = typeof status.used === "number" ? status.used : 0;
+    const statusAvail = typeof status.avail === "number" ? status.avail : 0;
+    const statusEnabled = typeof status.enabled === "number" ? status.enabled : 1;
+    const statusContent = typeof status.content === "string" ? status.content : "";
+
+    const storageConfigShared = storageConfig && typeof storageConfig.shared === "number" ? storageConfig.shared : 0;
+    const storageConfigPath = storageConfig && typeof storageConfig.path === "string" ? storageConfig.path : undefined;
 
     return {
       id: `${nodeName}:storage/${storageName}`,
       name: storageName,
       node: nodeName,
-      status: status.active ? "available" : "unavailable",
-      isAvailable: status.active === 1,
-      type: status.type ?? "unknown",
-      total: status.total ?? 0,
-      used: status.used ?? 0,
-      available: status.avail ?? 0,
-      isShared: storageConfig?.shared === 1,
-      path: storageConfig?.path as string | undefined,
-      contentTypes: (status.content ?? "").split(",").filter(Boolean),
-      enabled: status.enabled !== 0,
+      status: statusActive ? "available" : "unavailable",
+      isAvailable: statusActive === 1,
+      type: statusType,
+      total: statusTotal,
+      used: statusUsed,
+      available: statusAvail,
+      isShared: storageConfigShared === 1,
+      path: storageConfigPath,
+      contentTypes: statusContent.split(",").filter(Boolean),
+      enabled: statusEnabled !== 0,
       config: storageConfig
         ? {
-            server: storageConfig.server as string | undefined,
-            export: storageConfig.export as string | undefined,
-            share: storageConfig.share as string | undefined,
-            vgname: storageConfig.vgname as string | undefined,
-            pool: storageConfig.pool as string | undefined,
-            thinpool: storageConfig.thinpool as string | undefined,
+            server: typeof storageConfig.server === "string" ? storageConfig.server : undefined,
+            export: typeof storageConfig.export === "string" ? storageConfig.export : undefined,
+            share: typeof storageConfig.share === "string" ? storageConfig.share : undefined,
+            vgname: typeof storageConfig.vgname === "string" ? storageConfig.vgname : undefined,
+            pool: typeof storageConfig.pool === "string" ? storageConfig.pool : undefined,
+            thinpool: typeof storageConfig.thinpool === "string" ? storageConfig.thinpool : undefined,
           }
         : undefined,
     };
@@ -290,21 +366,18 @@ export class ProxmoxIntegration
       const configMap: Record<string, string> = {};
 
       for (const part of parts) {
-        const [k, v] = part.split("=");
-        if (k && v) {
-          configMap[k.trim()] = v.trim();
+        const [key, value] = part.split("=");
+        if (key && value) {
+          configMap[key.trim()] = value.trim();
         }
       }
 
       const netInterface: NetworkInterface = {
         name: key,
         bridge: configMap.bridge ?? "",
-        macAddress:
-          type === "qemu"
-            ? parts[0]?.split("=")?.[1] // virtio=MAC or e1000=MAC
-            : configMap.hwaddr,
+        macAddress: type === "qemu" ? (parts[0] ? parts[0].split("=")[1] : undefined) : configMap.hwaddr,
         enabled: true,
-        model: type === "qemu" ? parts[0]?.split("=")?.[0] : undefined,
+        model: type === "qemu" ? (parts[0] ? parts[0].split("=")[0] : undefined) : undefined,
       };
 
       if (type === "lxc") {

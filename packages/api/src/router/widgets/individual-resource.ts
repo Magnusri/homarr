@@ -39,11 +39,11 @@ export const individualResourceRouter = createTRPCRouter({
         };
 
         // Initial fetch
-        void fetchData();
+        void fetchDataAsync();
 
         // Set up polling interval (every 5 seconds)
         const interval = setInterval(() => {
-          void fetchData();
+          void fetchDataAsync();
         }, 5000);
 
         return () => {
