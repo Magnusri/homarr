@@ -77,30 +77,29 @@ export const NodeDetailsComponent = ({ data, visibleSections }: NodeDetailsProps
           />
         )}
 
-        {visibleSections.includes("details") && (
+        {visibleSections.includes("uptime") && (
           <ResourceStatsCard
             title="Uptime"
             icon={IconClock}
             value={uptimeFormatted}
             color="violet"
-          >
+          />
+        )}
+
+        {visibleSections.includes("load") && (
+          <ResourceStatsCard title="Load Average" icon={IconBrain} value="" color="violet">
             <Card padding="xs" radius="sm" withBorder bg="gray.0">
-              <Stack gap={4}>
-                <Text size="xs" c="dimmed">
-                  Load Average
-                </Text>
-                <Group gap="md">
-                  <Text size="xs">1m: {data.loadAverage1.toFixed(2)}</Text>
-                  <Text size="xs">5m: {data.loadAverage5.toFixed(2)}</Text>
-                  <Text size="xs">15m: {data.loadAverage15.toFixed(2)}</Text>
-                </Group>
-              </Stack>
+              <Group gap="md">
+                <Text size="xs">1m: {data.loadAverage1.toFixed(2)}</Text>
+                <Text size="xs">5m: {data.loadAverage5.toFixed(2)}</Text>
+                <Text size="xs">15m: {data.loadAverage15.toFixed(2)}</Text>
+              </Group>
             </Card>
           </ResourceStatsCard>
         )}
       </SimpleGrid>
 
-      {visibleSections.includes("details") && (
+      {visibleSections.includes("system") && (
         <Card padding="sm" radius="md" withBorder>
           <Stack gap="xs">
             <Text size="sm" fw={500}>

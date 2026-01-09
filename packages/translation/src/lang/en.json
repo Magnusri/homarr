@@ -1969,7 +1969,13 @@
             "memory": "Memory",
             "storage": "Storage",
             "network": "Network",
-            "details": "Details"
+            "uptime": "Uptime",
+            "load": "Load Average",
+            "system": "System Information",
+            "container": "Container Information",
+            "snapshots": "Snapshots",
+            "configuration": "Configuration",
+            "type": "Storage Type"
           }
         }
       },

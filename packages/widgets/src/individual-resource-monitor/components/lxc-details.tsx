@@ -76,7 +76,7 @@ export const LxcDetailsComponent = ({ data, visibleSections }: LxcDetailsProps) 
           />
         )}
 
-        {visibleSections.includes("details") && (
+        {visibleSections.includes("uptime") && (
           <ResourceStatsCard title="Uptime" icon={IconClock} value={uptimeFormatted} color="violet" />
         )}
       </SimpleGrid>
@@ -116,7 +116,7 @@ export const LxcDetailsComponent = ({ data, visibleSections }: LxcDetailsProps) 
         </Card>
       )}
 
-      {visibleSections.includes("details") && (
+      {visibleSections.includes("container") && (
         <Card padding="sm" radius="md" withBorder>
           <Stack gap="xs">
             <Text size="sm" fw={500}>

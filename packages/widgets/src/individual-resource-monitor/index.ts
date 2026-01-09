@@ -49,11 +49,35 @@ export const { definition, componentLoader } = createWidgetDefinition("individua
             label: (t) => t("widget.individualResourceMonitor.option.visibleSections.option.network"),
           },
           {
-            value: "details",
-            label: (t) => t("widget.individualResourceMonitor.option.visibleSections.option.details"),
+            value: "uptime",
+            label: (t) => t("widget.individualResourceMonitor.option.visibleSections.option.uptime"),
+          },
+          {
+            value: "load",
+            label: (t) => t("widget.individualResourceMonitor.option.visibleSections.option.load"),
+          },
+          {
+            value: "system",
+            label: (t) => t("widget.individualResourceMonitor.option.visibleSections.option.system"),
+          },
+          {
+            value: "container",
+            label: (t) => t("widget.individualResourceMonitor.option.visibleSections.option.container"),
+          },
+          {
+            value: "snapshots",
+            label: (t) => t("widget.individualResourceMonitor.option.visibleSections.option.snapshots"),
+          },
+          {
+            value: "configuration",
+            label: (t) => t("widget.individualResourceMonitor.option.visibleSections.option.configuration"),
+          },
+          {
+            value: "type",
+            label: (t) => t("widget.individualResourceMonitor.option.visibleSections.option.type"),
           },
         ] as const,
-        defaultValue: ["cpu", "memory", "storage", "network", "details"] as const,
+        defaultValue: ["cpu", "memory", "storage", "network", "uptime", "load", "system", "container", "snapshots", "configuration", "type"] as const,
       }),
     }));
   },

@@ -76,16 +76,12 @@ export const QemuDetailsComponent = ({ data, visibleSections }: QemuDetailsProps
           />
         )}
 
-        {visibleSections.includes("details") && (
-          <ResourceStatsCard title="Uptime" icon={IconClock} value={uptimeFormatted} color="violet">
-            {data.snapshotCount > 0 && (
-              <Card padding="xs" radius="sm" withBorder bg="gray.0">
-                <Text size="xs" c="dimmed">
-                  Snapshots: {data.snapshotCount}
-                </Text>
-              </Card>
-            )}
-          </ResourceStatsCard>
+        {visibleSections.includes("uptime") && (
+          <ResourceStatsCard title="Uptime" icon={IconClock} value={uptimeFormatted} color="violet" />
+        )}
+
+        {visibleSections.includes("snapshots") && data.snapshotCount > 0 && (
+          <ResourceStatsCard title="Snapshots" icon={IconDatabase} value={String(data.snapshotCount)} color="cyan" />
         )}
       </SimpleGrid>
 
@@ -122,7 +118,7 @@ export const QemuDetailsComponent = ({ data, visibleSections }: QemuDetailsProps
         </Card>
       )}
 
-      {visibleSections.includes("details") && (
+      {visibleSections.includes("configuration") && (
         <Card padding="sm" radius="md" withBorder>
           <Stack gap="xs">
             <Text size="sm" fw={500}>

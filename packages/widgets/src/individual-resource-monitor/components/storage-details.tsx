@@ -40,7 +40,7 @@ export const StorageDetailsComponent = ({ data, visibleSections }: StorageDetail
           />
         )}
 
-        {visibleSections.includes("details") && (
+        {visibleSections.includes("type") && (
           <Card padding="sm" radius="md" withBorder>
             <Stack gap="xs">
               <Group gap="xs">
@@ -60,7 +60,7 @@ export const StorageDetailsComponent = ({ data, visibleSections }: StorageDetail
         )}
       </SimpleGrid>
 
-      {visibleSections.includes("details") && (
+      {visibleSections.includes("configuration") && (
         <Card padding="sm" radius="md" withBorder>
           <Stack gap="xs">
             <Text size="sm" fw={500}>
