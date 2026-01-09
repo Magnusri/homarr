@@ -85,9 +85,12 @@ export class ProxmoxIntegration
       rootFsTotal: nodeStatus.rootfs?.total ?? 0,
       rootFsUsed: nodeStatus.rootfs?.used ?? 0,
       uptime: nodeStatus.uptime ?? 0,
-      loadAverage1: Array.isArray(nodeStatus.loadavg) && typeof nodeStatus.loadavg[0] === "number" ? nodeStatus.loadavg[0] : 0,
-      loadAverage5: Array.isArray(nodeStatus.loadavg) && typeof nodeStatus.loadavg[1] === "number" ? nodeStatus.loadavg[1] : 0,
-      loadAverage15: Array.isArray(nodeStatus.loadavg) && typeof nodeStatus.loadavg[2] === "number" ? nodeStatus.loadavg[2] : 0,
+      loadAverage1:
+        Array.isArray(nodeStatus.loadavg) && typeof nodeStatus.loadavg[0] === "number" ? nodeStatus.loadavg[0] : 0,
+      loadAverage5:
+        Array.isArray(nodeStatus.loadavg) && typeof nodeStatus.loadavg[1] === "number" ? nodeStatus.loadavg[1] : 0,
+      loadAverage15:
+        Array.isArray(nodeStatus.loadavg) && typeof nodeStatus.loadavg[2] === "number" ? nodeStatus.loadavg[2] : 0,
       version: nodeStatus.pveversion ?? "Unknown",
       kernelVersion: nodeStatus.kversion ?? "Unknown",
       pveVersion: nodeStatus.pveversion ?? "Unknown",
@@ -118,9 +121,9 @@ export class ProxmoxIntegration
       node: nodeName,
       status: status.status ?? "unknown",
       isRunning: status.status === "running",
-      osType: config.ostype as string | undefined,
-      hostname: config.hostname as string | undefined,
-      cpuCores: config.cores as number,
+      osType: config.ostype,
+      hostname: config.hostname,
+      cpuCores: config.cores!,
       cpuUtilization: status.cpu ?? 0,
       memoryTotal: status.maxmem ?? 0,
       memoryUsed: status.mem ?? 0,
@@ -131,10 +134,10 @@ export class ProxmoxIntegration
       uptime: status.uptime ?? 0,
       networkInterfaces,
       disks,
-      privileged: config.unprivileged !== 1,
-      protected: config.protection === 1,
-      tags: config.tags as string | undefined,
-      description: config.description as string | undefined,
+      privileged: config.unprivileged !== true && config.unprivileged !== 1,
+      protected: config.protection === true || config.protection === 1,
+      tags: config.tags,
+      description: config.description,
     };
   }
 
@@ -160,11 +163,16 @@ export class ProxmoxIntegration
 
     // Try to get guest OS info from agent if available
     let guestOsInfo: QemuDetails["guestOsInfo"];
-    const agentEnabled = status.agent === 1 || config.agent === 1 || config.agent === "1";
+    const agentEnabled =
+      status.agent === true ||
+      status.agent === 1 ||
+      config.agent === true ||
+      config.agent === 1 ||
+      config.agent === "1";
     if (agentEnabled && status.status === "running") {
       try {
         const osInfo = await proxmox.nodes.$(nodeName).qemu.$(vmId).agent["get-osinfo"].$get();
-        if (osInfo && osInfo.result) {
+        if (osInfo?.result) {
           guestOsInfo = {
             name: osInfo.result.name as string | undefined,
             version: osInfo.result.version as string | undefined,
@@ -192,9 +200,9 @@ export class ProxmoxIntegration
       node: nodeName,
       status: status.status ?? "unknown",
       isRunning: status.status === "running",
-      cpuSockets: (config.sockets as number) ?? 1,
-      cpuCores: (config.cores as number) ?? 1,
-      cpuType: config.cpu as string | undefined,
+      cpuSockets: config.sockets! ?? 1,
+      cpuCores: config.cores! ?? 1,
+      cpuType: config.cpu,
       cpuUtilization: status.cpu ?? 0,
       memoryTotal: status.maxmem ?? 0,
       memoryUsed: status.mem ?? 0,
@@ -206,13 +214,13 @@ export class ProxmoxIntegration
       agentEnabled,
       guestOsInfo,
       snapshotCount,
-      bootOrder: config.boot as string | undefined,
-      vgaType: config.vga as string | undefined,
-      biosType: config.bios as string | undefined,
-      machineType: config.machine as string | undefined,
-      protected: config.protection === 1,
-      tags: config.tags as string | undefined,
-      description: config.description as string | undefined,
+      bootOrder: config.boot,
+      vgaType: config.vga,
+      biosType: config.bios,
+      machineType: config.machine,
+      protected: config.protection === true || config.protection === 1,
+      tags: config.tags,
+      description: config.description,
     };
   }
 
@@ -265,10 +273,7 @@ export class ProxmoxIntegration
    * Parse network interface configuration from VM/LXC config
    * Supports both QEMU (netN) and LXC (netN) network configs
    */
-  private parseNetworkInterfaces(
-    config: Record<string, unknown>,
-    type: "qemu" | "lxc",
-  ): NetworkInterface[] {
+  private parseNetworkInterfaces(config: Record<string, unknown>, type: "qemu" | "lxc"): NetworkInterface[] {
     const interfaces: NetworkInterface[] = [];
 
     for (let i = 0; i < 32; i++) {
@@ -330,10 +335,17 @@ export class ProxmoxIntegration
       // LXC: rootfs and mpN
       const rootfs = config.rootfs;
       if (rootfs && typeof rootfs === "string") {
-        const match = rootfs.match(/^([^:]+):([^,]+),?.*size=(\d+)([MGT])?/);
+        const match = /^([^:]+):([^,]+),?.*size=(\d+)([MGT])?/.exec(rootfs);
         if (match) {
           const [, storage, , sizeStr, unit] = match;
-          const multiplier = unit === "G" ? 1024 * 1024 * 1024 : unit === "M" ? 1024 * 1024 : unit === "T" ? 1024 * 1024 * 1024 * 1024 : 1;
+          const multiplier =
+            unit === "G"
+              ? 1024 * 1024 * 1024
+              : unit === "M"
+                ? 1024 * 1024
+                : unit === "T"
+                  ? 1024 * 1024 * 1024 * 1024
+                  : 1;
           disks.push({
             id: "rootfs",
             storage: storage ?? "",
@@ -348,10 +360,17 @@ export class ProxmoxIntegration
         const key = `mp${i}`;
         const mpConfig = config[key];
         if (mpConfig && typeof mpConfig === "string") {
-          const match = mpConfig.match(/^([^:]+):([^,]+),?.*mp=([^,]+).*size=(\d+)([MGT])?/);
+          const match = /^([^:]+):([^,]+),?.*mp=([^,]+).*size=(\d+)([MGT])?/.exec(mpConfig);
           if (match) {
             const [, storage, , mountPoint, sizeStr, unit] = match;
-            const multiplier = unit === "G" ? 1024 * 1024 * 1024 : unit === "M" ? 1024 * 1024 : unit === "T" ? 1024 * 1024 * 1024 * 1024 : 1;
+            const multiplier =
+              unit === "G"
+                ? 1024 * 1024 * 1024
+                : unit === "M"
+                  ? 1024 * 1024
+                  : unit === "T"
+                    ? 1024 * 1024 * 1024 * 1024
+                    : 1;
             disks.push({
               id: key,
               storage: storage ?? "",
@@ -369,10 +388,17 @@ export class ProxmoxIntegration
           const key = `${diskType}${i}`;
           const diskConfig = config[key];
           if (diskConfig && typeof diskConfig === "string") {
-            const match = diskConfig.match(/^([^:]+):([^,]+),?.*size=(\d+)([MGT])?/);
+            const match = /^([^:]+):([^,]+),?.*size=(\d+)([MGT])?/.exec(diskConfig);
             if (match) {
               const [, storage, , sizeStr, unit] = match;
-              const multiplier = unit === "G" ? 1024 * 1024 * 1024 : unit === "M" ? 1024 * 1024 : unit === "T" ? 1024 * 1024 * 1024 * 1024 : 1;
+              const multiplier =
+                unit === "G"
+                  ? 1024 * 1024 * 1024
+                  : unit === "M"
+                    ? 1024 * 1024
+                    : unit === "T"
+                      ? 1024 * 1024 * 1024 * 1024
+                      : 1;
               disks.push({
                 id: key,
                 storage: storage ?? "",

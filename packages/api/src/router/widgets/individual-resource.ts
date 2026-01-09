@@ -2,13 +2,7 @@ import { observable } from "@trpc/server/observable";
 import { z } from "zod/v4";
 
 import { createIntegrationAsync } from "@homarr/integrations";
-import type {
-  IIndividualResourceMonitoringIntegration,
-  LxcDetails,
-  NodeDetails,
-  QemuDetails,
-  StorageDetails,
-} from "@homarr/integrations/types";
+import type { LxcDetails, NodeDetails, QemuDetails, StorageDetails } from "@homarr/integrations/types";
 
 import { createOneIntegrationMiddleware } from "../../middlewares/integration";
 import { createTRPCRouter, publicProcedure } from "../../trpc";
@@ -24,9 +18,7 @@ export const individualResourceRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const integration = await createIntegrationAsync(ctx.integration);
-      const result = (await integration.getNodeDetailsAsync(
-        input.nodeName,
-      )) as NodeDetails;
+      const result = await integration.getNodeDetailsAsync(input.nodeName);
       return result;
     }),
 
@@ -40,11 +32,9 @@ export const individualResourceRouter = createTRPCRouter({
     )
     .subscription(({ ctx, input }) => {
       return observable<NodeDetails>((emit) => {
-        const fetchData = async () => {
+        const fetchDataAsync = async () => {
           const integration = await createIntegrationAsync(ctx.integration);
-          const result = (await integration.getNodeDetailsAsync(
-            input.nodeName,
-          )) as NodeDetails;
+          const result = await integration.getNodeDetailsAsync(input.nodeName);
           emit.next(result);
         };
 
@@ -73,10 +63,7 @@ export const individualResourceRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const integration = await createIntegrationAsync(ctx.integration);
-      const result = (await integration.getLxcDetailsAsync(
-        input.nodeName,
-        input.vmId,
-      )) as LxcDetails;
+      const result = await integration.getLxcDetailsAsync(input.nodeName, input.vmId);
       return result;
     }),
 
@@ -91,21 +78,18 @@ export const individualResourceRouter = createTRPCRouter({
     )
     .subscription(({ ctx, input }) => {
       return observable<LxcDetails>((emit) => {
-        const fetchData = async () => {
+        const fetchDataAsync = async () => {
           const integration = await createIntegrationAsync(ctx.integration);
-          const result = (await integration.getLxcDetailsAsync(
-            input.nodeName,
-            input.vmId,
-          )) as LxcDetails;
+          const result = await integration.getLxcDetailsAsync(input.nodeName, input.vmId);
           emit.next(result);
         };
 
         // Initial fetch
-        void fetchData();
+        void fetchDataAsync();
 
         // Set up polling interval (every 5 seconds)
         const interval = setInterval(() => {
-          void fetchData();
+          void fetchDataAsync();
         }, 5000);
 
         return () => {
@@ -125,10 +109,7 @@ export const individualResourceRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const integration = await createIntegrationAsync(ctx.integration);
-      const result = (await integration.getQemuDetailsAsync(
-        input.nodeName,
-        input.vmId,
-      )) as QemuDetails;
+      const result = await integration.getQemuDetailsAsync(input.nodeName, input.vmId);
       return result;
     }),
 
@@ -143,21 +124,18 @@ export const individualResourceRouter = createTRPCRouter({
     )
     .subscription(({ ctx, input }) => {
       return observable<QemuDetails>((emit) => {
-        const fetchData = async () => {
+        const fetchDataAsync = async () => {
           const integration = await createIntegrationAsync(ctx.integration);
-          const result = (await integration.getQemuDetailsAsync(
-            input.nodeName,
-            input.vmId,
-          )) as QemuDetails;
+          const result = await integration.getQemuDetailsAsync(input.nodeName, input.vmId);
           emit.next(result);
         };
 
         // Initial fetch
-        void fetchData();
+        void fetchDataAsync();
 
         // Set up polling interval (every 5 seconds)
         const interval = setInterval(() => {
-          void fetchData();
+          void fetchDataAsync();
         }, 5000);
 
         return () => {
@@ -177,10 +155,7 @@ export const individualResourceRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const integration = await createIntegrationAsync(ctx.integration);
-      const result = (await integration.getStorageDetailsAsync(
-        input.nodeName,
-        input.storageName,
-      )) as StorageDetails;
+      const result = await integration.getStorageDetailsAsync(input.nodeName, input.storageName);
       return result;
     }),
 
@@ -195,21 +170,18 @@ export const individualResourceRouter = createTRPCRouter({
     )
     .subscription(({ ctx, input }) => {
       return observable<StorageDetails>((emit) => {
-        const fetchData = async () => {
+        const fetchDataAsync = async () => {
           const integration = await createIntegrationAsync(ctx.integration);
-          const result = (await integration.getStorageDetailsAsync(
-            input.nodeName,
-            input.storageName,
-          )) as StorageDetails;
+          const result = await integration.getStorageDetailsAsync(input.nodeName, input.storageName);
           emit.next(result);
         };
 
         // Initial fetch
-        void fetchData();
+        void fetchDataAsync();
 
         // Set up polling interval (every 5 seconds)
         const interval = setInterval(() => {
-          void fetchData();
+          void fetchDataAsync();
         }, 5000);
 
         return () => {

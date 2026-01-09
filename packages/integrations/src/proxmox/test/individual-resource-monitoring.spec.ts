@@ -62,10 +62,7 @@ describe("Proxmox Individual Resource Monitoring Integration", () => {
       };
 
       // Act
-      const integration = (await createIntegrationAsync(
-        testIntegration,
-        mockedFetch,
-      )) as IIndividualResourceMonitoringIntegration;
+      const integration = (await createIntegrationAsync(testIntegration)) as IIndividualResourceMonitoringIntegration;
       const result = await integration.getNodeDetailsAsync("pve");
 
       // Assert
@@ -137,10 +134,7 @@ describe("Proxmox Individual Resource Monitoring Integration", () => {
       };
 
       // Act
-      const integration = (await createIntegrationAsync(
-        testIntegration,
-        mockedFetch,
-      )) as IIndividualResourceMonitoringIntegration;
+      const integration = (await createIntegrationAsync(testIntegration)) as IIndividualResourceMonitoringIntegration;
       const result = await integration.getLxcDetailsAsync("pve", 100);
 
       // Assert
@@ -214,11 +208,7 @@ describe("Proxmox Individual Resource Monitoring Integration", () => {
           return Promise.resolve(
             new Response(
               JSON.stringify({
-                data: [
-                  { name: "current" },
-                  { name: "snap1" },
-                  { name: "snap2" },
-                ],
+                data: [{ name: "current" }, { name: "snap1" }, { name: "snap2" }],
               }),
               {
                 status: 200,
@@ -231,10 +221,7 @@ describe("Proxmox Individual Resource Monitoring Integration", () => {
       };
 
       // Act
-      const integration = (await createIntegrationAsync(
-        testIntegration,
-        mockedFetch,
-      )) as IIndividualResourceMonitoringIntegration;
+      const integration = (await createIntegrationAsync(testIntegration)) as IIndividualResourceMonitoringIntegration;
       const result = await integration.getQemuDetailsAsync("pve", 101);
 
       // Assert
@@ -306,10 +293,7 @@ describe("Proxmox Individual Resource Monitoring Integration", () => {
       };
 
       // Act
-      const integration = (await createIntegrationAsync(
-        testIntegration,
-        mockedFetch,
-      )) as IIndividualResourceMonitoringIntegration;
+      const integration = (await createIntegrationAsync(testIntegration)) as IIndividualResourceMonitoringIntegration;
       const result = await integration.getStorageDetailsAsync("pve", "local-lvm");
 
       // Assert

@@ -35,7 +35,13 @@ export default function IndividualResourceMonitorWidget(props: WidgetComponentPr
 
   // Render based on resource type
   if (options.resourceType === "node") {
-    return <NodeMonitor integrationId={integrationId} nodeName={options.nodeName} visibleSections={options.visibleSections} />;
+    return (
+      <NodeMonitor
+        integrationId={integrationId}
+        nodeName={options.nodeName}
+        visibleSections={options.visibleSections}
+      />
+    );
   }
 
   if (!options.resourceIdentifier) {
@@ -55,7 +61,14 @@ export default function IndividualResourceMonitorWidget(props: WidgetComponentPr
         </Center>
       );
     }
-    return <LxcMonitor integrationId={integrationId} nodeName={options.nodeName} vmId={vmId} visibleSections={options.visibleSections} />;
+    return (
+      <LxcMonitor
+        integrationId={integrationId}
+        nodeName={options.nodeName}
+        vmId={vmId}
+        visibleSections={options.visibleSections}
+      />
+    );
   }
 
   if (options.resourceType === "qemu") {
@@ -67,24 +80,24 @@ export default function IndividualResourceMonitorWidget(props: WidgetComponentPr
         </Center>
       );
     }
-    return <QemuMonitor integrationId={integrationId} nodeName={options.nodeName} vmId={vmId} visibleSections={options.visibleSections} />;
-  }
-
-  if (options.resourceType === "storage") {
     return (
-      <StorageMonitor
+      <QemuMonitor
         integrationId={integrationId}
         nodeName={options.nodeName}
-        storageName={options.resourceIdentifier}
+        vmId={vmId}
         visibleSections={options.visibleSections}
       />
     );
   }
 
+  // Default case: storage resource type
   return (
-    <Center h="100%">
-      <Text c="dimmed">{t("widget.individualResourceMonitor.error.unknownResourceType")}</Text>
-    </Center>
+    <StorageMonitor
+      integrationId={integrationId}
+      nodeName={options.nodeName}
+      storageName={options.resourceIdentifier}
+      visibleSections={options.visibleSections}
+    />
   );
 }
 
@@ -115,7 +128,11 @@ function NodeMonitor({ integrationId, nodeName, visibleSections }: NodeMonitorPr
       <Center h="100%">
         <Stack gap="xs" align="center">
           <Text c="red">{t("widget.individualResourceMonitor.error.failedToLoad")}</Text>
-          {error && <Text size="xs" c="dimmed">{error.message}</Text>}
+          {error && (
+            <Text size="xs" c="dimmed">
+              {error.message}
+            </Text>
+          )}
         </Stack>
       </Center>
     );
@@ -156,7 +173,11 @@ function LxcMonitor({ integrationId, nodeName, vmId, visibleSections }: LxcMonit
       <Center h="100%">
         <Stack gap="xs" align="center">
           <Text c="red">{t("widget.individualResourceMonitor.error.failedToLoad")}</Text>
-          {error && <Text size="xs" c="dimmed">{error.message}</Text>}
+          {error && (
+            <Text size="xs" c="dimmed">
+              {error.message}
+            </Text>
+          )}
         </Stack>
       </Center>
     );
@@ -197,7 +218,11 @@ function QemuMonitor({ integrationId, nodeName, vmId, visibleSections }: QemuMon
       <Center h="100%">
         <Stack gap="xs" align="center">
           <Text c="red">{t("widget.individualResourceMonitor.error.failedToLoad")}</Text>
-          {error && <Text size="xs" c="dimmed">{error.message}</Text>}
+          {error && (
+            <Text size="xs" c="dimmed">
+              {error.message}
+            </Text>
+          )}
         </Stack>
       </Center>
     );
@@ -238,7 +263,11 @@ function StorageMonitor({ integrationId, nodeName, storageName, visibleSections 
       <Center h="100%">
         <Stack gap="xs" align="center">
           <Text c="red">{t("widget.individualResourceMonitor.error.failedToLoad")}</Text>
-          {error && <Text size="xs" c="dimmed">{error.message}</Text>}
+          {error && (
+            <Text size="xs" c="dimmed">
+              {error.message}
+            </Text>
+          )}
         </Stack>
       </Center>
     );
