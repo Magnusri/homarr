@@ -6,6 +6,7 @@ import { downloadsRouter } from "./downloads";
 import { firewallRouter } from "./firewall";
 import { healthMonitoringRouter } from "./health-monitoring";
 import { indexerManagerRouter } from "./indexer-manager";
+import { individualResourceRouter } from "./individual-resource";
 import { mediaReleaseRouter } from "./media-release";
 import { mediaRequestsRouter } from "./media-requests";
 import { mediaServerRouter } from "./media-server";
@@ -36,6 +37,7 @@ export const widgetRouter = createTRPCRouter({
   rssFeed: rssFeedRouter,
   indexerManager: indexerManagerRouter,
   healthMonitoring: healthMonitoringRouter,
+  individualResource: individualResourceRouter,
   mediaTranscoding: mediaTranscodingRouter,
   minecraft: minecraftRouter,
   options: optionsRouter,
