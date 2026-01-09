@@ -23,6 +23,7 @@ export const widgetKinds = [
   "bookmarks",
   "indexerManager",
   "healthMonitoring",
+  "individualResourceMonitor",
   "releases",
   "mediaReleases",
   "dockerContainers",
