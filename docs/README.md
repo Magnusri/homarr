@@ -1,3 +1,6 @@
+## WARNING
+# This fork contains improvements generated entirely by AI! Use at your own risk.
+
 ![](img/logo/2340450-2-title.png)
 
 <!-- Badges -->
