@@ -1,4 +1,5 @@
 import { IconServer } from "@tabler/icons-react";
+import { z } from "zod/v4";
 
 import { createWidgetDefinition } from "../definition";
 import { optionsBuilder } from "../options";
@@ -30,6 +31,7 @@ export const { definition, componentLoader } = createWidgetDefinition("individua
       refreshInterval: factory.number({
         defaultValue: 5000,
         withDescription: true,
+        validate: z.number().min(1000).max(60000),
       }),
       visibleSections: factory.multiSelect({
         options: [
