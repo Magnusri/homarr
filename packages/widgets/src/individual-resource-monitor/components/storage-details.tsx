@@ -1,8 +1,8 @@
 import { Badge, Card, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { IconDatabase, IconServer } from "@tabler/icons-react";
 
+import { humanFileSize } from "@homarr/common";
 import type { StorageDetails } from "@homarr/integrations/types";
-import { humanFileSize } from "@homarr/ui";
 
 import { ResourceStatsCard } from "./resource-stats-card";
 

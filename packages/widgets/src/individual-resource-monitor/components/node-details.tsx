@@ -3,8 +3,8 @@ import { IconBrain, IconCpu, IconClock, IconDatabase, IconServer } from "@tabler
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 
+import { humanFileSize } from "@homarr/common";
 import type { NodeDetails } from "@homarr/integrations/types";
-import { humanFileSize } from "@homarr/ui";
 
 import { ResourceStatsCard } from "./resource-stats-card";
 
