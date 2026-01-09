@@ -15,11 +15,11 @@ export const StorageDetailsComponent = ({ data, visibleSections }: StorageDetail
   const usagePercent = data.total > 0 ? Math.round((data.used / data.total) * 100) : 0;
 
   return (
-    <Stack gap="md">
+    <Stack gap="sm" p={10}>
       <Group justify="space-between">
         <Group gap="xs">
-          <IconDatabase size={24} />
-          <Title order={3}>{data.name}</Title>
+          <IconDatabase size={18} />
+          <Title order={4}>{data.name}</Title>
         </Group>
         <Badge color={data.isAvailable ? "green" : "red"}>{data.status}</Badge>
       </Group>

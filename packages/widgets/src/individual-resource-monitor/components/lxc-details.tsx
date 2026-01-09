@@ -22,11 +22,11 @@ export const LxcDetailsComponent = ({ data, visibleSections }: LxcDetailsProps) 
   const uptimeFormatted = data.uptime > 0 ? dayjs.duration(data.uptime, "seconds").format("D[d] H[h] m[m]") : "N/A";
 
   return (
-    <Stack gap="md">
+    <Stack gap="sm" p={10}>
       <Group justify="space-between">
         <Group gap="xs">
-          <IconContainer size={24} />
-          <Title order={3}>
+          <IconContainer size={18} />
+          <Title order={4}>
             {data.name} (CT {data.vmId})
           </Title>
         </Group>

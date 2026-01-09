@@ -24,11 +24,11 @@ export const NodeDetailsComponent = ({ data, visibleSections }: NodeDetailsProps
   const uptimeFormatted = dayjs.duration(data.uptime, "seconds").format("D[d] H[h] m[m]");
 
   return (
-    <Stack gap="md">
+    <Stack gap="sm" p={10}>
       <Group justify="space-between">
         <Group gap="xs">
-          <IconServer size={24} />
-          <Title order={3}>{data.name}</Title>
+          <IconServer size={18} />
+          <Title order={4}>{data.name}</Title>
         </Group>
         <Badge color={data.isOnline ? "green" : "red"}>{data.status}</Badge>
       </Group>
