@@ -7,6 +7,8 @@ on:
 jobs:
   trigger-docs-release:
     name: Trigger Documentation Release
+    # Only run on the original repository, not on forks
+    if: github.repository == 'homarr-labs/homarr'
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
@@ -39,6 +41,8 @@ jobs:
           EOF
   update-bug-report-template:
     name: Update Bug Report Template
+    # Only run on the original repository, not on forks
+    if: github.repository == 'homarr-labs/homarr'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
