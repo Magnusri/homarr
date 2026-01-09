@@ -44,13 +44,13 @@ export class ProxmoxIntegration
     const proxmox = this.getPromoxApi();
     const resources = await proxmox.cluster.resources.$get();
 
-    logger.info("Found resources in Proxmox cluster", {
-      total: resources.length,
-      node: resources.filter((resource) => resource.type === "node").length,
-      lxc: resources.filter((resource) => resource.type === "lxc").length,
-      qemu: resources.filter((resource) => resource.type === "qemu").length,
-      storage: resources.filter((resource) => resource.type === "storage").length,
-    });
+    // logger.info("Found resources in Proxmox cluster", {
+    //   total: resources.length,
+    //   node: resources.filter((resource) => resource.type === "node").length,
+    //   lxc: resources.filter((resource) => resource.type === "lxc").length,
+    //   qemu: resources.filter((resource) => resource.type === "qemu").length,
+    //   storage: resources.filter((resource) => resource.type === "storage").length,
+    // });
 
     const mappedResources = resources.map(mapResource).filter((resource) => resource !== null);
     return {
